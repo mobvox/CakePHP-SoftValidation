@@ -8,7 +8,7 @@ class SoftValidationBehavior extends ModelBehavior {
  * Hold the softValidate rules extracted from model.
  * Eg: array('ModelName' => array( //rules extracted ));
  */
-	public $softValidate = array();
+	protected $_softValidate = array();
 /**
  * Hold default settings.
  */
@@ -23,11 +23,21 @@ class SoftValidationBehavior extends ModelBehavior {
  */
 	public function setup(&$model, $config = array()) {
 		$this->__model =& $model;
-		$this->softValidate[$model->alias] = $this->_parseSoftValidates();
+		$this->_softValidate[$model->alias] = $this->_parseSoftValidates();
 	}
 
-	public function afterSave(&$model, $created){
+	public function beforeSave(&$model){
+		$model->validate = Set::merge($model->validate, $this->_softValidate[$model->alias]);
+		$validates = $model->validates();
+		$model->validationErrors = array();
+
+		if($validates){
+			return $model->beforeSaveSoftValidationSuccess();
+		}else{
+			return $model->beforeSaveSoftValidationFail();
+		}
 		
+		return true;
 	}
 
 /**
@@ -36,8 +46,6 @@ class SoftValidationBehavior extends ModelBehavior {
  */
 	protected function _parseSoftValidates(){
 		$softValidate = array();
-
-
 		foreach ($this->__model->validate as $field => $rules){
 			foreach($rules as $rule){
 				if(!is_array($rule)){
@@ -51,4 +59,11 @@ class SoftValidationBehavior extends ModelBehavior {
 		}
 		return $softValidate;
 	}
+
+	/**
+	 * Callbacks API.
+	 */
+	public function beforeSaveSoftValidationSuccess(){	return true; }
+
+	public function beforeSaveSoftValidationFail(){ return true; }
 }
