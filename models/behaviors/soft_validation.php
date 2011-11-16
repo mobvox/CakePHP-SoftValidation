@@ -37,7 +37,11 @@ class SoftValidationBehavior extends ModelBehavior {
 		$this->_softValidate();
 		return $this->_triggerCallback();
 	}
-
+/**
+ * Perform the softValidation rules
+ *
+ * @return void
+ */
 	protected function _softValidate(){
 		$this->__Model->validate = Set::merge($this->__Model->validate, $this->_softValidateFields[$this->__Model->alias]);
 		$validates = $this->__Model->validates();
@@ -48,7 +52,11 @@ class SoftValidationBehavior extends ModelBehavior {
 			$this->_softValidationUpdateStatus(false);
 		}
 	}
-
+/**
+ * Trigger callbacks.
+ *
+ * @return boolean
+ */
 	protected function _triggerCallback(){
 		if($this->getSoftValidationStatus($this->__Model)){
 			return $this->__Model->beforeSaveSoftValidationSuccess();
