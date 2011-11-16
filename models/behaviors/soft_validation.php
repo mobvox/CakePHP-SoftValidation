@@ -75,7 +75,6 @@ class SoftValidationBehavior extends ModelBehavior {
 			$this->__Model->set($data);
 			$this->_softValidate();
 		}
-		debug($this->_softValidateStatus);
 		if(isset($this->_softValidateStatus[$Model->alias])){
 			return $this->_softValidateStatus[$Model->alias];
 		}
